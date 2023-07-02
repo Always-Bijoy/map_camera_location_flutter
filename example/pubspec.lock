@@ -419,10 +419,10 @@ packages:
     dependency: "direct dev"
     description:
       name: permission_handler
-      sha256: "2fd3a61adf28e0f7774fa40c469a740eca42ef4f10c9b91559f66ff45f28876c"
+      sha256: "37fcc3c3182ac0bf8856f3e973e11c7bef5556d69f1a0d8fb908f51019c2912d"
       url: "https://pub.dev"
     source: hosted
-    version: "10.4.0"
+    version: "10.4.1"
   permission_handler_android:
     dependency: transitive
     description:
@@ -435,18 +435,18 @@ packages:
     dependency: transitive
     description:
       name: permission_handler_apple
-      sha256: "9aab0712fab020b90f5a49ea504bb347a2eae21da16f94c74bc70d0031a46c96"
+      sha256: "0d1f8007b17573ff1fbeae0f04b6c8e83e1d2f6c4fe8e8226d4d2456aa8ecffe"
       url: "https://pub.dev"
     source: hosted
-    version: "9.1.1"
+    version: "9.1.2"
   permission_handler_platform_interface:
     dependency: transitive
     description:
       name: permission_handler_platform_interface
-      sha256: "0bcae4a6c349f37bcc2a5019c97c03229bdd0eedf98dcf6966710c615bb566ce"
+      sha256: "79b36d93a41a4aecfd0d635d77552f327cb84227c718ce5e68b5f7b85546fe7e"
       url: "https://pub.dev"
     source: hosted
-    version: "3.11.0"
+    version: "3.11.0+1"
   permission_handler_windows:
     dependency: transitive
     description:

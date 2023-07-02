@@ -1,7 +1,7 @@
 name: map_camera_flutter
-description: A new Flutter project.
+description: The MapCameraLocation package provides a convenient way to capture images with location data using the device's camera. It allows you to integrate camera functionality into your Flutter applications and retrieve the captured image along with its corresponding location information. This package simplifies the process of capturing images and location data, making it easier to develop location-aware applications.
 version: 0.0.1
-homepage:
+homepage: https://github.com/Always-Bijoy/map_camera_location_flutter
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
@@ -18,9 +18,11 @@ dependencies:
   intl: ^0.17.0
   path_provider: ^2.0.11
   flutter_map: ^5.0.0
-  flutter_map_location_marker:
+  flutter_map_location_marker: ^7.0.0
   url_launcher: ^6.1.11
-  permission_handler:
+  flutter_compass: ^0.7.0
+  permission_handler: ^10.4.1
+  latlong2: ^0.9.0
 
 dev_dependencies:
   flutter_test:
