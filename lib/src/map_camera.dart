@@ -117,7 +117,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   @override
   void initState() {
     super.initState();
-
+    updatePosition(context);
     // Initialize the camera controller
     _controller = CameraController(
       widget.camera,
@@ -135,6 +135,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   @override
   void dispose() {
     _controller.dispose();
+    // _followCurrentLocationStreamController.close();
     super.dispose();
   }
 
@@ -161,7 +162,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
-                          height: 130,
+                          height: 160,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -174,7 +175,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
                                       borderRadius: BorderRadius.circular(8.0)),
                                   child: SizedBox(
                                     // height: 130,
-                                    width: 100,
+                                    width: 120,
                                     child: Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: latitudeServer == null
