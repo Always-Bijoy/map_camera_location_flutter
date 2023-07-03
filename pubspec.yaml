@@ -1,5 +1,7 @@
 name: map_camera_flutter
 description: The MapCameraLocation package provides a convenient way to capture images with map and location data using the device's camera.
+
+version: 0.0.2
 homepage: https://github.com/Always-Bijoy/map_camera_location_flutter
 
 environment:
