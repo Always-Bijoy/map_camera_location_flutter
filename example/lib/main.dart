@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:  MyHomePage(title: 'Flutter Demo Home Page',camera: camera,),
+      home:  MyHomePage(title: 'Camera With Map Location',camera: camera,),
     );
   }
 }

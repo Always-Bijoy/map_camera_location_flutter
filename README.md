@@ -1,6 +1,9 @@
 # map_camera_location
 
 A Flutter package that provides a widget for capturing images with the device camera and retrieving the user's location information.
+<br>
+
+[//]: # (<img src="/Users/bijoy/Documents/personal/map_camera_flutter/assets/mapcamera.png)
 
 ## Features
 
