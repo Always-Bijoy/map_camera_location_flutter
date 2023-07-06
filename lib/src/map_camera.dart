@@ -80,7 +80,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   /// File path of the captured camera image.
 
   File? ssImage;
-  /// (Please provide information about its purpose.)
+  /// File path of the captured screen shot image.
 
   String? dateTime;
   /// A formatted string representing the current date and time.
@@ -135,7 +135,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   @override
   void dispose() {
     _controller.dispose();
-    // _followCurrentLocationStreamController.close();
+    _followCurrentLocationStreamController.close();
     super.dispose();
   }
 
@@ -436,14 +436,6 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
       // If location services are disabled, throw an exception
       throw Exception('Location services are disabled.');
     }
-
-    // Check camera permission
-    final cameraStatus = await Permission.camera.status;
-    if (cameraStatus.isDenied || cameraStatus.isPermanentlyDenied) {
-      // If camera permission is not granted, request it
-      await Permission.camera.request();
-    }
-
     // Check location permission
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {

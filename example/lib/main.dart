@@ -39,44 +39,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Check if location services are enabled
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // If location services are disabled, show an error message or request the user to enable them
-      throw Exception('Location services are disabled.');
-    }
-    // Check location permission
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      // If location permission is denied, request it
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // If location permission is still denied, show an error message or redirect the user to the app settings
-        throw Exception('Location permissions are denied');
-      }
-    }
-
-    // Check if location permission is permanently denied
-    if (permission == LocationPermission.deniedForever) {
-      // Show an error message or redirect the user to the app settings to enable location permissions
-      throw Exception('Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // Get the current position
-    return await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.best,
-    );
-  }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _determinePosition();
   }
 
   @override
