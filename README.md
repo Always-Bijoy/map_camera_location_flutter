@@ -1,4 +1,4 @@
-# map_camera_location
+# map_camera_flutter
 
 A Flutter package that provides a widget for capturing images with the device camera and retrieving the user's location information.
 <br>
@@ -13,18 +13,18 @@ A Flutter package that provides a widget for capturing images with the device ca
 
 ## Getting Started
 
-To use this package, add `map_camera_location` as a dependency in your `pubspec.yaml` file.
+To use this package, add `map_camera_flutter` as a dependency in your `pubspec.yaml` file.
 
 ```yaml
 dependencies:
-  map_camera_location: ^2.0.0
+  map_camera_flutter: ^2.0.0
 ```
 ### Usage
 
 Import the package in your Dart file:
 
 ```dart
-import 'package:map_camera_location/map_camera_location.dart';
+import 'package:map_camera_flutter/map_camera_flutter.dart';
 ```
 
 ## Permissions
@@ -63,7 +63,7 @@ Here's an example of how to use the `MapCameraLocation` widget:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:map_camera_location/map_camera_location.dart';
+import 'package:map_camera_flutter/map_camera_flutter.dart';
 
 void main() {
   runApp(MyApp());
@@ -75,7 +75,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Camera Location Demo'),
+          title: Text('Camera with map location'),
         ),
         body: Center(
           child: MapCameraLocation(

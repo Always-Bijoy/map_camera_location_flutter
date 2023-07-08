@@ -6,23 +6,30 @@ import '../../map_camera_flutter.dart';
 
 
 
-///import 'package:your_app/map_camera_location.dart'; // Import the file where the MapCameraLocation widget is defined
+///import 'package:your_app/map_camera_flutter.dart'; // Import the file where the MapCameraLocation widget is defined
 
 /// ```
 /// void main() {
-///   runApp(MyApp());
+/// final cameras = await availableCameras();
+/// final firstCamera = cameras.first;
+///   runApp(MyApp(camera: firstCamera));
 /// }
 ///
 /// class MyApp extends StatelessWidget {
+/// final CameraDescription camera;
+/// const MyApp({super.key, required this.camera});
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return MaterialApp(
-///       home: CameraLocationScreen(),
+///       home: CameraLocationScreen(camera: firstCamera),
 ///     );
 ///   }
 /// }
 ///
 /// class CameraLocationScreen extends StatelessWidget {
+/// final CameraDescription camera;
+/// const MyApp({super.key, required this.camera});
 //   // Callback function to handle the captured image and location data
 ///   void handleImageAndLocationData(ImageAndLocationData data) {
 //     // You can use the data here as needed
@@ -37,7 +44,7 @@ import '../../map_camera_flutter.dart';
 ///   Widget build(BuildContext context) {
 ///     // Provide the CameraDescription and the handleImageAndLocationData callback function to the MapCameraLocation widget
 ///     return MapCameraLocation(
-///       camera: YOUR_CAMERA_DESCRIPTION_OBJECT, // Replace YOUR_CAMERA_DESCRIPTION_OBJECT with your actual CameraDescription
+///       camera: camera, // YOUR_CAMERA_DESCRIPTION_OBJECT, // Replace YOUR_CAMERA_DESCRIPTION_OBJECT with your actual CameraDescription
 ///       onImageCaptured: handleImageAndLocationData,
 ///     );
 ///   }
