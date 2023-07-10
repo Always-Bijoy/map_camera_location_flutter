@@ -1,7 +1,6 @@
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 import 'package:latlong2/latlong.dart' as lat;
-import 'package:permission_handler/permission_handler.dart';
 import '../../map_camera_flutter.dart';
 
 
