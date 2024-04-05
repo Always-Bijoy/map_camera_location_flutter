@@ -1,4 +1,4 @@
-class ImageAndLocationData{
+class ImageAndLocationData {
   final String? imagePath;
   final String? latitude;
   final String? longitude;

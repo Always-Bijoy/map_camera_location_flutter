@@ -3,8 +3,6 @@ import 'dart:ui' as ui;
 import 'package:latlong2/latlong.dart' as lat;
 import '../../map_camera_flutter.dart';
 
-
-
 ///import 'package:your_app/map_camera_flutter.dart'; // Import the file where the MapCameraLocation widget is defined
 
 /// ```
@@ -36,7 +34,7 @@ import '../../map_camera_flutter.dart';
 ///     print('Latitude: ${data.latitude}');
 ///     print('Longitude: ${data.longitude}');
 ///     print('Location Name: ${data.locationName}');
-///     print('Sublocation: ${data.subLocation}');
+///     print('SubLocation: ${data.subLocation}');
 ///   }
 ///
 ///   @override
@@ -50,7 +48,6 @@ import '../../map_camera_flutter.dart';
 /// }
 /// ```
 
-
 // Callback function type for capturing image and location data
 typedef ImageAndLocationCallback = void Function(ImageAndLocationData data);
 
@@ -62,8 +59,8 @@ class MapCameraLocation extends StatefulWidget {
   ///
   /// The [camera] parameter is required and represents the camera to be used for capturing images.
   /// The [onImageCaptured] parameter is an optional callback function that will be triggered when an image and location data are captured.
-  const MapCameraLocation({Key? key, required this.camera, this.onImageCaptured}) : super(key: key);
-
+  const MapCameraLocation(
+      {super.key, required this.camera, this.onImageCaptured});
 
   @override
   State<MapCameraLocation> createState() => _MapCameraLocationState();
@@ -71,43 +68,56 @@ class MapCameraLocation extends StatefulWidget {
 
 class _MapCameraLocationState extends State<MapCameraLocation> {
   late CameraController _controller;
+
   /// Represents a controller for the camera, used to control camera-related operations.
 
   late Future<void> _initializeControllerFuture;
+
   /// Represents a future that resolves when the camera controller has finished initializing.
 
-  late FollowOnLocationUpdate _followOnLocationUpdate;
+  late AlignOnUpdate _followOnLocationUpdate;
+
   /// Enum value indicating when to follow location updates.
 
   late StreamController<double?> _followCurrentLocationStreamController;
+
   /// Stream controller used to track the current location.
 
   File? cameraImagePath;
+
   /// File path of the captured camera image.
 
   File? ssImage;
+
   /// File path of the captured screen shot image.
 
   String? dateTime;
+
   /// A formatted string representing the current date and time.
 
   final globalKey = GlobalKey();
+
   /// Key used to uniquely identify and control a widget.
 
   Placemark? placeMark;
+
   /// Represents geocoded location information.
 
   String? latitudeServer;
+
   /// Latitude value of the current location as a string.
 
   String? longitudeServer;
+
   /// Longitude value of the current location as a string.
 
   String? locationName;
+
   /// Name of the current location as a string.
 
   String? subLocation;
-  /// Sublocation of the current location as a string.
+
+  /// SubLocation of the current location as a string.
 
   /// Callback function to retrieve the image and location data.
   ImageAndLocationData getImageAndLocationData() {
@@ -123,20 +133,22 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   @override
   void initState() {
     super.initState();
-    updatePosition(context);
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      await updatePosition(context);
+    });
+
     // Initialize the camera controller
     _controller = CameraController(
       widget.camera,
       ResolutionPreset.medium,
     );
     _initializeControllerFuture = _controller.initialize();
-    _followOnLocationUpdate = FollowOnLocationUpdate.always;
+    _followOnLocationUpdate = AlignOnUpdate.always;
     _followCurrentLocationStreamController = StreamController<double?>();
 
     // Get the current date and time in a formatted string
     dateTime = DateFormat.yMd().add_jm().format(DateTime.now());
   }
-
 
   @override
   void dispose() {
@@ -190,16 +202,18 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
                                                   CircularProgressIndicator())
                                           : FlutterMap(
                                               options: MapOptions(
-                                                center: const lat.LatLng(0, 0),
-                                                zoom: 13.0,
+                                                initialCenter:
+                                                    const lat.LatLng(0, 0),
+                                                initialZoom: 13.0,
                                                 onPositionChanged:
                                                     (MapPosition position,
                                                         bool hasGesture) {
                                                   if (hasGesture) {
                                                     setState(
-                                                      () => _followOnLocationUpdate =
-                                                          FollowOnLocationUpdate
-                                                              .never,
+                                                      () =>
+                                                          _followOnLocationUpdate =
+                                                              AlignOnUpdate
+                                                                  .never,
                                                     );
                                                   }
                                                 },
@@ -213,10 +227,10 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
                                                   minZoom: 12,
                                                 ),
                                                 CurrentLocationLayer(
-                                                  followCurrentLocationStream:
+                                                  alignPositionStream:
                                                       _followCurrentLocationStreamController
                                                           .stream,
-                                                  followOnLocationUpdate:
+                                                  alignPositionOnUpdate:
                                                       _followOnLocationUpdate,
                                                 ),
                                               ],
@@ -342,7 +356,8 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     var rng = Random();
 
     // Get the render boundary of the widget
-    final RenderRepaintBoundary boundary = globalKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+    final RenderRepaintBoundary boundary =
+        globalKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
 
     // Capture the screen as an image
     ui.Image image = await boundary.toImage();
@@ -384,7 +399,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   }
 
   /// Updates the current position by retrieving the latitude, longitude, location name,
-  /// and sublocation based on the user's device location. Updates the corresponding
+  /// and subLocation based on the user's device location. Updates the corresponding
   /// state variables with the retrieved data.
   /// Throws an exception if there is an error retrieving the location information.
   Future<void> updatePosition(BuildContext context) async {
@@ -392,25 +407,29 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
       // Determine the current position
       final position = await _determinePosition();
 
-      // Retrieve the placemarks for the current position
-      final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      // Retrieve the placeMarks for the current position
+      final placeMarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
 
-      if (placemarks.isNotEmpty) {
-        final placemark = placemarks.first;
+      if (placeMarks.isNotEmpty) {
+        final placeMark = placeMarks.first;
 
         // Update the state variables with the retrieved location data
         setState(() {
           latitudeServer = position.latitude.toString();
           longitudeServer = position.longitude.toString();
-          locationName = "${placemark.locality ?? ""}, ${placemark.administrativeArea ?? ""}, ${placemark.country ?? ""}";
-          subLocation = "${placemark.street ?? ""}, ${placemark.thoroughfare ?? ""} ${placemark.administrativeArea ?? ""}";
+          locationName =
+              "${placeMark.locality ?? ""}, ${placeMark.administrativeArea ?? ""}, ${placeMark.country ?? ""}";
+          subLocation =
+              "${placeMark.street ?? ""}, ${placeMark.thoroughfare ?? ""} ${placeMark.administrativeArea ?? ""}";
         });
 
         if (kDebugMode) {
-          print("Latitude: $latitudeServer, Longitude: $longitudeServer, Location: $locationName");
+          print(
+              "Latitude: $latitudeServer, Longitude: $longitudeServer, Location: $locationName");
         }
       } else {
-        // Handle case when no placemark is available
+        // Handle case when no placeMark is available
         setState(() {
           latitudeServer = null;
           longitudeServer = null;
@@ -429,7 +448,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     }
   }
 
-  /// Determines the current position using the Geolocator package.
+  /// Determines the current position using the GeoLocator package.
   /// Returns the current position as a [Position] object.
   /// Throws an exception if there is an error determining the position or if the necessary permissions are not granted.
   Future<Position> _determinePosition() async {
@@ -456,7 +475,8 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     // Check if location permission is permanently denied
     if (permission == LocationPermission.deniedForever) {
       // Throw an exception if location permission is permanently denied
-      throw Exception('Location permissions are permanently denied, we cannot request permissions.');
+      throw Exception(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     // Get the current position
