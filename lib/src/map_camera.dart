@@ -3,8 +3,6 @@ import 'dart:ui' as ui;
 import 'package:latlong2/latlong.dart' as lat;
 import '../../map_camera_flutter.dart';
 
-
-
 ///import 'package:your_app/map_camera_flutter.dart'; // Import the file where the MapCameraLocation widget is defined
 
 /// ```
@@ -50,7 +48,6 @@ import '../../map_camera_flutter.dart';
 /// }
 /// ```
 
-
 // Callback function type for capturing image and location data
 typedef ImageAndLocationCallback = void Function(ImageAndLocationData data);
 
@@ -62,8 +59,9 @@ class MapCameraLocation extends StatefulWidget {
   ///
   /// The [camera] parameter is required and represents the camera to be used for capturing images.
   /// The [onImageCaptured] parameter is an optional callback function that will be triggered when an image and location data are captured.
-  const MapCameraLocation({Key? key, required this.camera, this.onImageCaptured}) : super(key: key);
-
+  const MapCameraLocation(
+      {Key? key, required this.camera, this.onImageCaptured})
+      : super(key: key);
 
   @override
   State<MapCameraLocation> createState() => _MapCameraLocationState();
@@ -71,42 +69,55 @@ class MapCameraLocation extends StatefulWidget {
 
 class _MapCameraLocationState extends State<MapCameraLocation> {
   late CameraController _controller;
+
   /// Represents a controller for the camera, used to control camera-related operations.
 
   late Future<void> _initializeControllerFuture;
+
   /// Represents a future that resolves when the camera controller has finished initializing.
 
   late FollowOnLocationUpdate _followOnLocationUpdate;
+
   /// Enum value indicating when to follow location updates.
 
   late StreamController<double?> _followCurrentLocationStreamController;
+
   /// Stream controller used to track the current location.
 
   File? cameraImagePath;
+
   /// File path of the captured camera image.
 
   File? ssImage;
+
   /// File path of the captured screen shot image.
 
   String? dateTime;
+
   /// A formatted string representing the current date and time.
 
   final globalKey = GlobalKey();
+
   /// Key used to uniquely identify and control a widget.
 
   Placemark? placeMark;
+
   /// Represents geocoded location information.
 
   String? latitudeServer;
+
   /// Latitude value of the current location as a string.
 
   String? longitudeServer;
+
   /// Longitude value of the current location as a string.
 
   String? locationName;
+
   /// Name of the current location as a string.
 
   String? subLocation;
+
   /// Sublocation of the current location as a string.
 
   /// Callback function to retrieve the image and location data.
@@ -136,7 +147,6 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     // Get the current date and time in a formatted string
     dateTime = DateFormat.yMd().add_jm().format(DateTime.now());
   }
-
 
   @override
   void dispose() {
@@ -342,7 +352,8 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     var rng = Random();
 
     // Get the render boundary of the widget
-    final RenderRepaintBoundary boundary = globalKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+    final RenderRepaintBoundary boundary =
+        globalKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
 
     // Capture the screen as an image
     ui.Image image = await boundary.toImage();
@@ -393,7 +404,8 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
       final position = await _determinePosition();
 
       // Retrieve the placemarks for the current position
-      final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      final placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
 
       if (placemarks.isNotEmpty) {
         final placemark = placemarks.first;
@@ -402,12 +414,15 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
         setState(() {
           latitudeServer = position.latitude.toString();
           longitudeServer = position.longitude.toString();
-          locationName = "${placemark.locality ?? ""}, ${placemark.administrativeArea ?? ""}, ${placemark.country ?? ""}";
-          subLocation = "${placemark.street ?? ""}, ${placemark.thoroughfare ?? ""} ${placemark.administrativeArea ?? ""}";
+          locationName =
+              "${placemark.locality ?? ""}, ${placemark.administrativeArea ?? ""}, ${placemark.country ?? ""}";
+          subLocation =
+              "${placemark.street ?? ""}, ${placemark.thoroughfare ?? ""} ${placemark.administrativeArea ?? ""}";
         });
 
         if (kDebugMode) {
-          print("Latitude: $latitudeServer, Longitude: $longitudeServer, Location: $locationName");
+          print(
+              "Latitude: $latitudeServer, Longitude: $longitudeServer, Location: $locationName");
         }
       } else {
         // Handle case when no placemark is available
@@ -456,7 +471,8 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     // Check if location permission is permanently denied
     if (permission == LocationPermission.deniedForever) {
       // Throw an exception if location permission is permanently denied
-      throw Exception('Location permissions are permanently denied, we cannot request permissions.');
+      throw Exception(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     // Get the current position
