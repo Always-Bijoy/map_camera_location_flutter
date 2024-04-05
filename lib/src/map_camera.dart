@@ -133,7 +133,10 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   @override
   void initState() {
     super.initState();
-    updatePosition(context);
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      await updatePosition(context);
+    });
+
     // Initialize the camera controller
     _controller = CameraController(
       widget.camera,
@@ -199,16 +202,18 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
                                                   CircularProgressIndicator())
                                           : FlutterMap(
                                               options: MapOptions(
-                                                initialCenter: const lat.LatLng(0, 0),
+                                                initialCenter:
+                                                    const lat.LatLng(0, 0),
                                                 initialZoom: 13.0,
                                                 onPositionChanged:
                                                     (MapPosition position,
                                                         bool hasGesture) {
                                                   if (hasGesture) {
                                                     setState(
-                                                      () => _followOnLocationUpdate =
-                                                          AlignOnUpdate
-                                                              .never,
+                                                      () =>
+                                                          _followOnLocationUpdate =
+                                                              AlignOnUpdate
+                                                                  .never,
                                                     );
                                                   }
                                                 },
