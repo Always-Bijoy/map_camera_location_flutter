@@ -17,7 +17,7 @@ To use this package, add `map_camera_flutter` as a dependency in your `pubspec.y
 
 ```yaml
 dependencies:
-  map_camera_flutter: ^0.0.4
+  map_camera_flutter: ^0.0.5
 ```
 ### Usage
 
