@@ -34,7 +34,7 @@ import '../../map_camera_flutter.dart';
 ///     print('Latitude: ${data.latitude}');
 ///     print('Longitude: ${data.longitude}');
 ///     print('Location Name: ${data.locationName}');
-///     print('Sublocation: ${data.subLocation}');
+///     print('SubLocation: ${data.subLocation}');
 ///   }
 ///
 ///   @override
@@ -60,8 +60,7 @@ class MapCameraLocation extends StatefulWidget {
   /// The [camera] parameter is required and represents the camera to be used for capturing images.
   /// The [onImageCaptured] parameter is an optional callback function that will be triggered when an image and location data are captured.
   const MapCameraLocation(
-      {Key? key, required this.camera, this.onImageCaptured})
-      : super(key: key);
+      {super.key, required this.camera, this.onImageCaptured});
 
   @override
   State<MapCameraLocation> createState() => _MapCameraLocationState();
@@ -76,7 +75,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
 
   /// Represents a future that resolves when the camera controller has finished initializing.
 
-  late FollowOnLocationUpdate _followOnLocationUpdate;
+  late AlignOnUpdate _followOnLocationUpdate;
 
   /// Enum value indicating when to follow location updates.
 
@@ -118,7 +117,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
 
   String? subLocation;
 
-  /// Sublocation of the current location as a string.
+  /// SubLocation of the current location as a string.
 
   /// Callback function to retrieve the image and location data.
   ImageAndLocationData getImageAndLocationData() {
@@ -141,7 +140,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
       ResolutionPreset.medium,
     );
     _initializeControllerFuture = _controller.initialize();
-    _followOnLocationUpdate = FollowOnLocationUpdate.always;
+    _followOnLocationUpdate = AlignOnUpdate.always;
     _followCurrentLocationStreamController = StreamController<double?>();
 
     // Get the current date and time in a formatted string
@@ -200,15 +199,15 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
                                                   CircularProgressIndicator())
                                           : FlutterMap(
                                               options: MapOptions(
-                                                center: const lat.LatLng(0, 0),
-                                                zoom: 13.0,
+                                                initialCenter: const lat.LatLng(0, 0),
+                                                initialZoom: 13.0,
                                                 onPositionChanged:
                                                     (MapPosition position,
                                                         bool hasGesture) {
                                                   if (hasGesture) {
                                                     setState(
                                                       () => _followOnLocationUpdate =
-                                                          FollowOnLocationUpdate
+                                                          AlignOnUpdate
                                                               .never,
                                                     );
                                                   }
@@ -223,10 +222,10 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
                                                   minZoom: 12,
                                                 ),
                                                 CurrentLocationLayer(
-                                                  followCurrentLocationStream:
+                                                  alignPositionStream:
                                                       _followCurrentLocationStreamController
                                                           .stream,
-                                                  followOnLocationUpdate:
+                                                  alignPositionOnUpdate:
                                                       _followOnLocationUpdate,
                                                 ),
                                               ],
@@ -395,7 +394,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   }
 
   /// Updates the current position by retrieving the latitude, longitude, location name,
-  /// and sublocation based on the user's device location. Updates the corresponding
+  /// and subLocation based on the user's device location. Updates the corresponding
   /// state variables with the retrieved data.
   /// Throws an exception if there is an error retrieving the location information.
   Future<void> updatePosition(BuildContext context) async {
@@ -403,21 +402,21 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
       // Determine the current position
       final position = await _determinePosition();
 
-      // Retrieve the placemarks for the current position
-      final placemarks =
+      // Retrieve the placeMarks for the current position
+      final placeMarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
 
-      if (placemarks.isNotEmpty) {
-        final placemark = placemarks.first;
+      if (placeMarks.isNotEmpty) {
+        final placeMark = placeMarks.first;
 
         // Update the state variables with the retrieved location data
         setState(() {
           latitudeServer = position.latitude.toString();
           longitudeServer = position.longitude.toString();
           locationName =
-              "${placemark.locality ?? ""}, ${placemark.administrativeArea ?? ""}, ${placemark.country ?? ""}";
+              "${placeMark.locality ?? ""}, ${placeMark.administrativeArea ?? ""}, ${placeMark.country ?? ""}";
           subLocation =
-              "${placemark.street ?? ""}, ${placemark.thoroughfare ?? ""} ${placemark.administrativeArea ?? ""}";
+              "${placeMark.street ?? ""}, ${placeMark.thoroughfare ?? ""} ${placeMark.administrativeArea ?? ""}";
         });
 
         if (kDebugMode) {
@@ -425,7 +424,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
               "Latitude: $latitudeServer, Longitude: $longitudeServer, Location: $locationName");
         }
       } else {
-        // Handle case when no placemark is available
+        // Handle case when no placeMark is available
         setState(() {
           latitudeServer = null;
           longitudeServer = null;
@@ -444,7 +443,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     }
   }
 
-  /// Determines the current position using the Geolocator package.
+  /// Determines the current position using the GeoLocator package.
   /// Returns the current position as a [Position] object.
   /// Throws an exception if there is an error determining the position or if the necessary permissions are not granted.
   Future<Position> _determinePosition() async {
