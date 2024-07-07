@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 import 'package:latlong2/latlong.dart' as lat;
@@ -145,7 +146,6 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     _positionTimer?.cancel();
     super.dispose();
   }
-
 
   @override
   void setState(fn) {
