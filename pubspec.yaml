@@ -1,7 +1,7 @@
 name: map_camera_flutter
 description: The Map Camera flutter package provides a convenient way to capture images with map and location data using the device's camera.
 
-version: 0.0.5
+version: 0.0.6
 homepage: https://github.com/Always-Bijoy/map_camera_location_flutter
 
 environment:
@@ -12,13 +12,13 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  camera: ^0.10.3
-  geolocator: ^11.0.0
+  camera: ^0.11.0+1
+  geolocator: ^12.0.0
   geocoding: ^3.0.0
   intl: ^0.19.0
   path_provider: ^2.0.11
-  flutter_map: ^6.1.0
-  flutter_map_location_marker: ^8.0.8
+  flutter_map: ^7.0.2
+  flutter_map_location_marker: ^9.0.0
   url_launcher: ^6.1.11
   flutter_compass: ^0.8.0
   permission_handler: ^11.3.1
@@ -27,7 +27,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.2
+  flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

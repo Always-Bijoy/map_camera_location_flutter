@@ -8,7 +8,7 @@ A Flutter package that provides a widget for capturing images with the device ca
 ## Features
 
 - Capture images using the device camera with attached Map
-- Retrieve the user's current location (latitude, longitude, location name, and sublocation)
+- Retrieve the user's current location (latitude, longitude, location name, and sub-location)
 - Option to provide a callback function to receive the captured image and location data
 
 ## Getting Started
@@ -17,7 +17,7 @@ To use this package, add `map_camera_flutter` as a dependency in your `pubspec.y
 
 ```yaml
 dependencies:
-  map_camera_flutter: ^0.0.5
+  map_camera_flutter: ^0.0.6
 ```
 ### Usage
 

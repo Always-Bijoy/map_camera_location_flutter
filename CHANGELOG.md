@@ -1,6 +1,5 @@
-## 0.0.5
+## 0.0.6
 
 # Changelog
 
-- Update Flutter Version
-- Location permission update
+- Performance Improvement

@@ -1,11 +1,11 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/ashutoshagarwal/Desktop/Development/flutter
-FLUTTER_APPLICATION_PATH=/Users/ashutoshagarwal/Documents/GitHub/map_camera_location_flutter
+FLUTTER_ROOT=/Users/bijoy/development/flutter
+FLUTTER_APPLICATION_PATH=/Users/bijoy/Documents/package/map_camera_location_flutter
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_TARGET=lib/main.dart
 FLUTTER_BUILD_DIR=build
-FLUTTER_BUILD_NAME=0.0.5
-FLUTTER_BUILD_NUMBER=0.0.5
+FLUTTER_BUILD_NAME=0.0.6
+FLUTTER_BUILD_NUMBER=0.0.6
 EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386
 EXCLUDED_ARCHS[sdk=iphoneos*]=armv7
 DART_OBFUSCATION=false
