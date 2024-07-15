@@ -1,7 +1,8 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 import 'package:latlong2/latlong.dart' as lat;
-import '../../map_camera_flutter.dart';
+import 'package:map_camera_flutter/map_camera_flutter.dart';
 
 ///import 'package:your_app/map_camera_flutter.dart'; // Import the file where the MapCameraLocation widget is defined
 
@@ -103,19 +104,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
 
   /// Represents geocoded location information.
 
-  String? latitudeServer;
-
-  /// Latitude value of the current location as a string.
-
-  String? longitudeServer;
-
-  /// Longitude value of the current location as a string.
-
-  String? locationName;
-
-  /// Name of the current location as a string.
-
-  String? subLocation;
+  LocationData? locationData;
 
   /// SubLocation of the current location as a string.
 
@@ -123,18 +112,18 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   ImageAndLocationData getImageAndLocationData() {
     return ImageAndLocationData(
       imagePath: cameraImagePath?.path,
-      latitude: latitudeServer,
-      longitude: longitudeServer,
-      locationName: locationName,
-      subLocation: subLocation,
+      locationData: locationData,
     );
   }
 
+  Timer? _positionTimer;
   @override
   void initState() {
     super.initState();
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
-      await updatePosition(context);
+    _positionTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (mounted) {
+        await updatePosition(context);
+      }
     });
 
     // Initialize the camera controller
@@ -154,7 +143,21 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
   void dispose() {
     _controller.dispose();
     _followCurrentLocationStreamController.close();
+    _positionTimer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        if (mounted) {
+          super.setState(fn);
+        }
+      });
+    }
   }
 
   @override
@@ -165,166 +168,171 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return RepaintBoundary(
-              key: globalKey,
-              child: Stack(
-                children: [
-                  CameraPreview(
-                    _controller,
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 10,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: 160,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Card(
-                                  elevation: 3,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0)),
-                                  child: SizedBox(
-                                    // height: 130,
-                                    width: 120,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: latitudeServer == null
-                                          ? const Center(
-                                              child:
-                                                  CircularProgressIndicator())
-                                          : FlutterMap(
-                                              options: MapOptions(
-                                                initialCenter:
-                                                    const lat.LatLng(0, 0),
-                                                initialZoom: 13.0,
-                                                onPositionChanged:
-                                                    (MapPosition position,
-                                                        bool hasGesture) {
-                                                  if (hasGesture) {
-                                                    setState(
-                                                      () =>
-                                                          _followOnLocationUpdate =
-                                                              AlignOnUpdate
-                                                                  .never,
-                                                    );
-                                                  }
-                                                },
+            return Center(
+              child: RepaintBoundary(
+                key: globalKey,
+                child: Stack(
+                  children: [
+                    CameraPreview(
+                      _controller,
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 10,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 160,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: Card(
+                                    elevation: 3,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0)),
+                                    child: SizedBox(
+                                      // height: 130,
+                                      width: 120,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: locationData == null
+                                            ? const Center(
+                                                child:
+                                                    CircularProgressIndicator())
+                                            : FlutterMap(
+                                                options: MapOptions(
+                                                  initialCenter:
+                                                      const lat.LatLng(0, 0),
+                                                  initialZoom: 13.0,
+                                                  onPositionChanged:
+                                                      (MapPosition position,
+                                                          bool hasGesture) {
+                                                    if (hasGesture) {
+                                                      setState(
+                                                        () =>
+                                                            _followOnLocationUpdate =
+                                                                AlignOnUpdate
+                                                                    .never,
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                                children: [
+                                                  TileLayer(
+                                                    urlTemplate:
+                                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                    userAgentPackageName:
+                                                        'com.example.app',
+                                                    minZoom: 12,
+                                                  ),
+                                                  CurrentLocationLayer(
+                                                    alignPositionStream:
+                                                        _followCurrentLocationStreamController
+                                                            .stream,
+                                                    alignPositionOnUpdate:
+                                                        _followOnLocationUpdate,
+                                                  ),
+                                                ],
                                               ),
-                                              children: [
-                                                TileLayer(
-                                                  urlTemplate:
-                                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                  userAgentPackageName:
-                                                      'com.example.app',
-                                                  minZoom: 12,
-                                                ),
-                                                CurrentLocationLayer(
-                                                  alignPositionStream:
-                                                      _followCurrentLocationStreamController
-                                                          .stream,
-                                                  alignPositionOnUpdate:
-                                                      _followOnLocationUpdate,
-                                                ),
-                                              ],
-                                            ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: Colors.black.withOpacity(0.5)),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        locationName ?? "Loading...",
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: false,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        subLocation ?? "Loading ..",
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: false,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        "Lat ${latitudeServer ?? "Loading.."}",
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: false,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        "Long ${longitudeServer ?? "Loading.."}",
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: false,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        dateTime ?? "Loading...",
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: false,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ],
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: Colors.black.withOpacity(0.5)),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          locationData?.locationName ??
+                                              "Loading...",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          locationData?.subLocation ??
+                                              "Loading ..",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          "Lat ${locationData?.latitude ?? "Loading.."}",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          "Long ${locationData?.longitude ?? "Loading.."}",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          dateTime ?? "Loading...",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              )
-                            ],
+                                const SizedBox(
+                                  width: 10,
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           } else {
@@ -386,10 +394,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
       if (widget.onImageCaptured != null) {
         ImageAndLocationData data = ImageAndLocationData(
           imagePath: imgFile.path,
-          latitude: latitudeServer,
-          longitude: longitudeServer,
-          locationName: locationName,
-          subLocation: subLocation,
+          locationData: locationData,
         );
         widget.onImageCaptured!(data);
       }
@@ -411,39 +416,43 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
       final placeMarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
 
+      LocationData locationData;
       if (placeMarks.isNotEmpty) {
         final placeMark = placeMarks.first;
 
+        locationData = LocationData(
+            latitude: position.latitude.toString(),
+            longitude: position.longitude.toString(),
+            locationName:
+                "${placeMark.locality ?? ""}, ${placeMark.administrativeArea ?? ""}, ${placeMark.country ?? ""}",
+            subLocation:
+                "${placeMark.street ?? ""}, ${placeMark.thoroughfare ?? ""} ${placeMark.administrativeArea ?? ""}");
+      } else {
+        locationData = LocationData(
+            longitude: null,
+            latitude: null,
+            locationName: 'No Location Data',
+            subLocation: "");
+      }
+      if (locationData != this.locationData) {
         // Update the state variables with the retrieved location data
         setState(() {
-          latitudeServer = position.latitude.toString();
-          longitudeServer = position.longitude.toString();
-          locationName =
-              "${placeMark.locality ?? ""}, ${placeMark.administrativeArea ?? ""}, ${placeMark.country ?? ""}";
-          subLocation =
-              "${placeMark.street ?? ""}, ${placeMark.thoroughfare ?? ""} ${placeMark.administrativeArea ?? ""}";
+          this.locationData = locationData;
         });
+      }
 
-        if (kDebugMode) {
-          print(
-              "Latitude: $latitudeServer, Longitude: $longitudeServer, Location: $locationName");
-        }
-      } else {
-        // Handle case when no placeMark is available
-        setState(() {
-          latitudeServer = null;
-          longitudeServer = null;
-          locationName = 'No Location Data';
-          subLocation = '';
-        });
+      if (kDebugMode) {
+        print(
+            "Latitude: ${locationData.latitude}, Longitude: ${locationData.longitude}, Location: ${locationData.locationName}");
       }
     } catch (e) {
       // Handle any errors that occurred during location retrieval
       setState(() {
-        latitudeServer = null;
-        longitudeServer = null;
-        locationName = 'Error Retrieving Location';
-        subLocation = '';
+        locationData = LocationData(
+            longitude: null,
+            latitude: null,
+            locationName: 'Error Retrieving Location',
+            subLocation: "");
       });
     }
   }
