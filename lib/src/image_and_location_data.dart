@@ -1,7 +1,7 @@
 class ImageAndLocationData {
   final String? imagePath;
   final LocationData? locationData;
-  String? get latitude => locationData?.longitude;
+  String? get latitude => locationData?.latitude;
   String? get longitude => locationData?.longitude;
   String? get locationName => locationData?.locationName;
   String? get subLocation => locationData?.subLocation;
