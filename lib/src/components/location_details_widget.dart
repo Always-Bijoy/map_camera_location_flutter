@@ -16,7 +16,7 @@ class LocationDetailsWidget extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          color: Colors.black.withOpacity(0.5)),
+          color: Colors.black.withValues(alpha: 0.5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
