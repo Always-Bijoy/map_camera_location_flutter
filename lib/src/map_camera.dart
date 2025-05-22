@@ -4,51 +4,6 @@ import 'dart:ui' as ui;
 import 'package:latlong2/latlong.dart' as lat;
 import 'package:map_camera_flutter/map_camera_flutter.dart';
 
-///import 'package:your_app/map_camera_flutter.dart'; // Import the file where the MapCameraLocation widget is defined
-
-/// ```
-/// void main() {
-/// final cameras = await availableCameras();
-/// final firstCamera = cameras.first;
-///   runApp(MyApp(camera: firstCamera));
-/// }
-///
-/// class MyApp extends StatelessWidget {
-/// final CameraDescription camera;
-/// const MyApp({super.key, required this.camera});
-///
-///   @override
-///   Widget build(BuildContext context) {
-///     return MaterialApp(
-///       home: CameraLocationScreen(camera: firstCamera),
-///     );
-///   }
-/// }
-///
-/// class CameraLocationScreen extends StatelessWidget {
-/// final CameraDescription camera;
-/// const MyApp({super.key, required this.camera});
-//   // Callback function to handle the captured image and location data
-///   void handleImageAndLocationData(ImageAndLocationData data) {
-//     // You can use the data here as needed
-///     print('Image Path: ${data.imagePath}');
-///     print('Latitude: ${data.latitude}');
-///     print('Longitude: ${data.longitude}');
-///     print('Location Name: ${data.locationName}');
-///     print('SubLocation: ${data.subLocation}');
-///   }
-///
-///   @override
-///   Widget build(BuildContext context) {
-///     // Provide the CameraDescription and the handleImageAndLocationData callback function to the MapCameraLocation widget
-///     return MapCameraLocation(
-///       camera: camera, // YOUR_CAMERA_DESCRIPTION_OBJECT, // Replace YOUR_CAMERA_DESCRIPTION_OBJECT with your actual CameraDescription
-///       onImageCaptured: handleImageAndLocationData,
-///     );
-///   }
-/// }
-/// ```
-
 // Callback function type for capturing image and location data
 typedef ImageAndLocationCallback = void Function(ImageAndLocationData data);
 
@@ -60,8 +15,11 @@ class MapCameraLocation extends StatefulWidget {
   ///
   /// The [camera] parameter is required and represents the camera to be used for capturing images.
   /// The [onImageCaptured] parameter is an optional callback function that will be triggered when an image and location data are captured.
-  const MapCameraLocation(
-      {super.key, required this.camera, this.onImageCaptured});
+  const MapCameraLocation({
+    super.key,
+    required this.camera,
+    this.onImageCaptured,
+  });
 
   @override
   State<MapCameraLocation> createState() => _MapCameraLocationState();
@@ -127,10 +85,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     });
 
     // Initialize the camera controller
-    _controller = CameraController(
-      widget.camera,
-      ResolutionPreset.medium,
-    );
+    _controller = CameraController(widget.camera, ResolutionPreset.medium);
     _initializeControllerFuture = _controller.initialize();
     _followOnLocationUpdate = AlignOnUpdate.always;
     _followCurrentLocationStreamController = StreamController<double?>();
@@ -173,9 +128,7 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
                 key: globalKey,
                 child: Stack(
                   children: [
-                    CameraPreview(
-                      _controller,
-                    ),
+                    CameraPreview(_controller),
                     Positioned(
                       left: 0,
                       right: 0,
@@ -190,67 +143,71 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
+                                    horizontal: 8.0,
+                                  ),
                                   child: Card(
                                     elevation: 3,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0)),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
                                     child: SizedBox(
                                       // height: 130,
                                       width: 120,
                                       child: Padding(
                                         padding: const EdgeInsets.all(5.0),
-                                        child: locationData == null
-                                            ? const Center(
-                                                child:
-                                                    CircularProgressIndicator())
-                                            : FlutterMap(
-                                                options: MapOptions(
-                                                  initialCenter:
-                                                      const lat.LatLng(0, 0),
-                                                  initialZoom: 13.0,
-                                                  onPositionChanged: (position,
-                                                      bool hasGesture) {
-                                                    if (hasGesture) {
-                                                      setState(
-                                                        () =>
-                                                            _followOnLocationUpdate =
-                                                                AlignOnUpdate
-                                                                    .never,
-                                                      );
-                                                    }
-                                                  },
+                                        child:
+                                            locationData == null
+                                                ? const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                )
+                                                : FlutterMap(
+                                                  options: MapOptions(
+                                                    initialCenter:
+                                                        const lat.LatLng(0, 0),
+                                                    initialZoom: 13.0,
+                                                    onPositionChanged: (
+                                                      position,
+                                                      bool hasGesture,
+                                                    ) {
+                                                      if (hasGesture) {
+                                                        setState(
+                                                          () =>
+                                                              _followOnLocationUpdate =
+                                                                  AlignOnUpdate
+                                                                      .never,
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
+                                                  children: [
+                                                    TileLayer(
+                                                      urlTemplate:
+                                                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                      userAgentPackageName:
+                                                          'com.example.app',
+                                                      minZoom: 12,
+                                                    ),
+                                                    CurrentLocationLayer(
+                                                      alignPositionStream:
+                                                          _followCurrentLocationStreamController
+                                                              .stream,
+                                                      alignPositionOnUpdate:
+                                                          _followOnLocationUpdate,
+                                                    ),
+                                                  ],
                                                 ),
-                                                children: [
-                                                  TileLayer(
-                                                    urlTemplate:
-                                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                    userAgentPackageName:
-                                                        'com.example.app',
-                                                    minZoom: 12,
-                                                  ),
-                                                  CurrentLocationLayer(
-                                                    alignPositionStream:
-                                                        _followCurrentLocationStreamController
-                                                            .stream,
-                                                    alignPositionOnUpdate:
-                                                        _followOnLocationUpdate,
-                                                  ),
-                                                ],
-                                              ),
                                       ),
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: LocationDetailsWidget(
-                                      locationData: locationData,
-                                      dateTime: dateTime),
+                                    locationData: locationData,
+                                    dateTime: dateTime,
+                                  ),
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                )
+                                const SizedBox(width: 10),
                               ],
                             ),
                           ),
@@ -339,26 +296,30 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
       final position = await _determinePosition();
 
       // Retrieve the placeMarks for the current position
-      final placeMarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
+      final placeMarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
       LocationData locationData;
       if (placeMarks.isNotEmpty) {
         final placeMark = placeMarks.first;
 
         locationData = LocationData(
-            latitude: position.latitude.toString(),
-            longitude: position.longitude.toString(),
-            locationName:
-                "${placeMark.locality ?? ""}, ${placeMark.administrativeArea ?? ""}, ${placeMark.country ?? ""}",
-            subLocation:
-                "${placeMark.street ?? ""}, ${placeMark.thoroughfare ?? ""} ${placeMark.administrativeArea ?? ""}");
+          latitude: position.latitude.toString(),
+          longitude: position.longitude.toString(),
+          locationName:
+              "${placeMark.locality ?? ""}, ${placeMark.administrativeArea ?? ""}, ${placeMark.country ?? ""}",
+          subLocation:
+              "${placeMark.street ?? ""}, ${placeMark.thoroughfare ?? ""} ${placeMark.administrativeArea ?? ""}",
+        );
       } else {
         locationData = LocationData(
-            longitude: null,
-            latitude: null,
-            locationName: 'No Location Data',
-            subLocation: "");
+          longitude: null,
+          latitude: null,
+          locationName: 'No Location Data',
+          subLocation: "",
+        );
       }
       if (locationData != this.locationData) {
         // Update the state variables with the retrieved location data
@@ -369,16 +330,18 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
 
       if (kDebugMode) {
         print(
-            "Latitude: ${locationData.latitude}, Longitude: ${locationData.longitude}, Location: ${locationData.locationName}");
+          "Latitude: ${locationData.latitude}, Longitude: ${locationData.longitude}, Location: ${locationData.locationName}",
+        );
       }
     } catch (e) {
       // Handle any errors that occurred during location retrieval
       setState(() {
         locationData = LocationData(
-            longitude: null,
-            latitude: null,
-            locationName: 'Error Retrieving Location',
-            subLocation: "");
+          longitude: null,
+          latitude: null,
+          locationName: 'Error Retrieving Location',
+          subLocation: "",
+        );
       });
     }
   }
@@ -411,7 +374,8 @@ class _MapCameraLocationState extends State<MapCameraLocation> {
     if (permission == LocationPermission.deniedForever) {
       // Throw an exception if location permission is permanently denied
       throw Exception(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     // Get the current position
